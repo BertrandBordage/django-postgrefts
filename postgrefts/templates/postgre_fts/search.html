@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load humanize sekizai_tags endless i18n %}
+
+
+{% block content %}
+  <h2>{% block title %}{% trans 'Search' %}{% endblock %}</h2>
+
+  <form method="get">
+    <div class="input-group">
+      <input id="id_q" name="q" type="text" class="form-control"
+             value="{{ query }}" autofocus="autofocus"
+             autocomplete="off" />
+      <span class="input-group-btn">
+        <button class="btn btn-default" type="submit">
+          <i class="fa fa-search"></i>
+        </button>
+      </span>
+    </div>
+  </form>
+
+  {% addtoblock 'js' strip %}
+    <script>
+      $(function() {
+        $('#id_q').autocomplete({
+          source: '{% url 'autocomplete' %}'
+        });
+      });
+    </script>
+  {% endaddtoblock %}
+
+  {% paginate 50 object_list %}
+
+  {% get_pages %}
+
+  {% with count=pages.total_count%}
+    <h3>
+      {{ count|apnumber|capfirst }}
+      {% blocktrans count counter=count %}result{% plural %}results{% endblocktrans %}
+    </h3>
+  {% endwith %}
+
+  {{ pages }}
+
+  <div class="results media-list">
+
+    {% for result in object_list.highlight %}
+      <div class="media">
+        {% if result.thumbnail_url %}
+          <a href="{{ result.url }}" class="media-left media-middle">
+            <img src="{{ result.thumbnail_url }}" />
+          </a>
+        {% endif %}
+        <div class="media-body media-middle">
+          <h3 class="media-heading">
+            <a href="{{ result.url }}">
+              {{ result.title }}
+            </a>
+          </h3>
+          <p>{{ result.highlight|safe }}</p>
+        </div>
+      </div>
+    {% endfor %}
+
+  </div>
+
+  {{ pages }}
+{% endblock %}
