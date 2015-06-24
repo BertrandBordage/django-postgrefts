@@ -15,6 +15,7 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.html import strip_tags
 from model_utils.managers import PassThroughManager
 from tqdm import tqdm
+from django.utils.six import string_types
 from .fields import VectorField
 
 from .registry import search_registry
@@ -119,7 +120,7 @@ def to_postgre_value(value):
     if isinstance(value, dict):
         return ', '.join(['%s=%s' % (k, to_postgre_value(v))
                           for k, v in value.items()])
-    if isinstance(value, basestring):
+    if isinstance(value, string_types):
         return "''%s''" % value
     return repr(value)
 
